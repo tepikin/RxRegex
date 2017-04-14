@@ -41,24 +41,27 @@ For create Observable use methods ```RxRegex.replace``` and ```RxRegex.find```. 
 Srting input = "Long text !12! for parsing !AB!";    // The character sequence to be matched
 Srting regex = "!..!";                               // Regular expression
 Srting replacement = "ABCD";                         // replacement text
-```
-```java
+
+
+// Simple usage
 RxRegex.replace(input, regex, replacement)      
     .subscribe(replace -> log(replace.toString()));  // logs out: 
                                                      //    Long text   -> Long text
                                                      //    !12!        -> ABCD
                                                      //    for parsing -> for parsing
                                                      //    !AB!        -> ABCD
-```
-```java
+
+
+// Stop parsing progess by dispose()
 Disposable disposable = RxRegex.replace(input, regex, replacement)
     .filter(RxRegex.OnAppend::isMatched)             // filter parts matched to regex
     .subscribe(replace -> log(replace.toString()));  // logs out:
                                                      //    !12! -> ABCD
                                                      //    !AB! -> ABCD
 disposable.dispose();  // you can stop parsing at any time.
-```
-```java
+
+
+// Object in onNext() is RxRegex.onAppend. It's fields description below.
 RxRegex.replace(input, regex, replacement)      
     .subscribe(replace -> {
         replace.getFromSrc()      // Start position of current part at original text
@@ -70,40 +73,30 @@ RxRegex.replace(input, regex, replacement)
         replace.isMatched()       // Is current part matched to regex
         replace.getProgress()     // Current parsing progress (float from 0 - to 1)
         replace.getMatchedCount() // Count of matched perts at this moment
-    });     
-```
-
-##Samples
-
-Reactive usage:
-```java
-RxRegex.replace("abcd", "bc", "BC", 0)  // create Observable 
- .subscribe(onAppend -> Log.i("",onAppend.getAppendDst()));   // write to log "a", "BC", "d"
-```
-
-Use reactive with threads:
-```java
+    });      
+    
+    
+// Use reactive with threads
 RxRegex.replace("abcd", "bc", "BC", 0)
  .subscribeOn(Schedulers.computation())
  .observeOn(AndroidSchedulers.mainThread())
  .scan(new StringBuffer(), (stringBuffer, onAppend) -> stringBuffer.append(onAppend.getAppendDst())).skip(1)
  .last(new StringBuffer()).map(stringBuffer -> stringBuffer.toString())
  .subscribe((result) -> Log.i("",result)); // result == "aBCd"
-```
+```    
 
-Non reactive usage:
-Just replace and get result.
-```java
-Regex.replace("abcd", "(bc)", "_$1_\\n\\r\\t\n\r\t", 0);  //result == "a_bc_\n\r\t\n\r\td"
-```
+## How to use Non reactive version
 
-Get result part by part to listener.
+Non reactive version work with class ```Regex```.
 ```java
-Regex.replace("abcd", "(bc)", "_$1_", 0, listener );  // calls Listener.append()  with args "a", "_bc_", "d"
-```
+// Simple usage
+String result = Regex.replace("abcd", "bc", "BC");  // result = "aBCd" 
 
-Ability to cancel the process. Use ```CancelationSignal```
-```java
-cancelationSignal.cancel();
-Regex.replace("abcd", "(bc)", "_$1_", 0, listener, cancelationSignal );  // listener never called
+// Use listener
+Regex.replace("abcd", "bc", "BC", 0, listener );    // calls Listener.append()  with args "a -> a", "bc -> BC", "d -> d"
+
+// Use CancelationSignal
+CancelationSignal cancelationSignal = new cancelationSignalImpl();
+Regex.replace("abcd", "(bc)", "_$1_", 0, listener, cancelationSignal ); 
+cancelationSignal.cancel();                         // cancelationSignal stop parsing process.
 ```
