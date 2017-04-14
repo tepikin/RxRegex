@@ -96,7 +96,7 @@ String result = Regex.replace("abcd", "bc", "BC");  // result = "aBCd"
 Regex.replace("abcd", "bc", "BC", 0, listener );    // calls Listener with args "a -> a", "bc -> BC", "d -> d"
 
 // Use CancelationSignal
-CancelationSignal cancelationSignal = new cancelationSignalImpl();
+CancelationSignal cancelationSignal = new CancelationSignalImpl();
 Regex.replace("abcd", "(bc)", "_$1_", 0, listener, cancelationSignal ); 
 cancelationSignal.cancel();                         // cancelationSignal stop parsing process.
 ```
