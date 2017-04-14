@@ -64,25 +64,25 @@ disposable.dispose();  // you can stop parsing at any time.
 // Object in onNext() is RxRegex.onAppend. It's fields description below.
 RxRegex.replace(input, regex, replacement)      
     .subscribe(replace -> {
-        replace.getFromSrc()      // Start position of current part at original text
-        replace.getToSrc()        // End position of current part at original text
-        replace.getAppendSrc()    // Cuttent processed text part from original text
-        replace.getFromDst()      // Start position of current part at replaced text
-        replace.getToDst()        // End position of current part at replaced text
-        replace.getAppendDst()    // Replaced text part
-        replace.isMatched()       // Is current part matched to regex
-        replace.getProgress()     // Current parsing progress (float from 0 - to 1)
-        replace.getMatchedCount() // Count of matched perts at this moment
+        replace.getFromSrc()         // Start position of current part at original text
+        replace.getToSrc()           // End position of current part at original text
+        replace.getAppendSrc()       // Cuttent processed text part from original text
+        replace.getFromDst()         // Start position of current part at replaced text
+        replace.getToDst()           // End position of current part at replaced text
+        replace.getAppendDst()       // Replaced text part
+        replace.isMatched()          // Is current part matched to regex
+        replace.getProgress()        // Current parsing progress (float from 0 - to 1)
+        replace.getMatchedCount()    // Count of matched perts at this moment
     });      
     
     
 // Use reactive with threads
 RxRegex.replace("abcd", "bc", "BC", 0)
- .subscribeOn(Schedulers.computation())
- .observeOn(AndroidSchedulers.mainThread())
+ .subscribeOn(Schedulers.computation())        // Parse in computation thread
+ .observeOn(AndroidSchedulers.mainThread())    // Observe in Android mainThread
  .scan(new StringBuffer(), (stringBuffer, onAppend) -> stringBuffer.append(onAppend.getAppendDst())).skip(1)
  .last(new StringBuffer()).map(stringBuffer -> stringBuffer.toString())
- .subscribe((result) -> Log.i("",result)); // result == "aBCd"
+ .subscribe((result) -> Log.i("",result));     // result == "aBCd"
 ```    
 
 ## How to use Non reactive version
@@ -93,7 +93,7 @@ Non reactive version work with class ```Regex```.
 String result = Regex.replace("abcd", "bc", "BC");  // result = "aBCd" 
 
 // Use listener
-Regex.replace("abcd", "bc", "BC", 0, listener );    // calls Listener.append()  with args "a -> a", "bc -> BC", "d -> d"
+Regex.replace("abcd", "bc", "BC", 0, listener );    // calls Listener with args "a -> a", "bc -> BC", "d -> d"
 
 // Use CancelationSignal
 CancelationSignal cancelationSignal = new cancelationSignalImpl();
