@@ -41,24 +41,24 @@ For create Observable use methods ```RxRegex.replace``` and ```RxRegex.find```. 
 Srting input = "Long text !12! for parsing !AB!";    // The character sequence to be matched
 Srting regex = "!..!";                               // Regular expression
 Srting replacement = "ABCD";                         // replacement text
-
-
+```
+```java
 RxRegex.replace(input, regex, replacement)      
     .subscribe(replace -> log(replace.toString()));  // logs out: 
                                                      //    Long text   -> Long text
                                                      //    !12!        -> ABCD
                                                      //    for parsing -> for parsing
                                                      //    !AB!        -> ABCD
-        
-        
+```
+```java
 Disposable disposable = RxRegex.replace(input, regex, replacement)      
     .filter(RxRegex.OnAppend::isMatched)             // filter parts matched to regex
     .subscribe(replace -> log(replace.toString()));  // logs out:                                                         
                                                      //    !12! -> ABCD
                                                      //    !AB! -> ABCD
 disposable.dispose();  // you can stop parsing at any time.
-
-
+```
+```java
 RxRegex.replace(input, regex, replacement)      
     .subscribe(replace -> {
         replace.getFromSrc()      // Start position of current part at original text
