@@ -38,15 +38,39 @@ dependencies {
 
 For create Observable use methods ```RxRegex.replace``` and ```RxRegex.find```. It's ```Disposable``` objects and you can use it for stop parsing process, you can use method ```dispose()``` or just unsubscribe from Observable and parsing stops automatically.
 ```java
-Srting input = "Long test for regex parsing 'abcd'"; // The character sequence to be matched
-Srting regex = "a(.*)d"; // Regular expression
-Srting replacement = "A$1D"; // replacement text
-int flags = 0; // Match flags, a bit mask that may include (CASE_INSENSITIVE, MULTILINE, DOTALL, UNICODE_CASE, CANON_EQ, UNIX_LINES, LITERAL, UNICODE_CHARACTER_CLASS, COMMENTS)
+Srting input = "Long text !12! for parsing !AB!";    // The character sequence to be matched
+Srting regex = "!..!";                               // Regular expression
+Srting replacement = "ABCD";                         // replacement text
 
-RxRegex.replace(input, regex, replacement);
-RxRegex.replace(input, regex, replacement, flags);     
-RxRegex.find(input, regex, replacement);
-RxRegex.find(input, regex, replacement, flags);
+
+RxRegex.replace(input, regex, replacement)      
+    .subscribe(replace -> log(replace.toString()));  // logs out: 
+                                                     //    Long text   -> Long text
+                                                     //    !12!        -> ABCD
+                                                     //    for parsing -> for parsing
+                                                     //    !AB!        -> ABCD
+        
+        
+Disposable disposable = RxRegex.replace(input, regex, replacement)      
+    .filter(RxRegex.OnAppend::isMatched)             // filter parts matched to regex
+    .subscribe(replace -> log(replace.toString()));  // logs out:                                                         
+                                                     //    !12! -> ABCD
+                                                     //    !AB! -> ABCD
+disposable.dispose();  // you can stop parsing at any time.
+
+
+RxRegex.replace(input, regex, replacement)      
+    .subscribe(replace -> {
+        replace.getFromSrc()      // Start position of current part at original text
+        replace.getToSrc()        // End position of current part at original text
+        replace.getAppendSrc()    // Cuttent processed text part from original text
+        replace.getFromDst()      // Start position of current part at replaced text
+        replace.getToDst()        // End position of current part at replaced text
+        replace.getAppendDst()    // Replaced text part
+        replace.isMatched()       // Is current part matched to regex
+        replace.getProgress()     // Current parsing progress (float from 0 - to 1)
+        replace.getMatchedCount() // Count of matched perts at this moment
+    });     
 ```
 
 ##Samples
