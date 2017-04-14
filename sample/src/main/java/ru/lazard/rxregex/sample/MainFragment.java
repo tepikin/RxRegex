@@ -27,16 +27,12 @@ public class MainFragment extends Fragment {
     public static final int DELAY = 1000;
     @BindView(R.id.regularExpression)
     EditText mRegularExpressionView;
-
     @BindView(R.id.replacement)
     EditText mReplacementView;
-
     @BindView(R.id.textForTest)
     EditText mTestView;
-
     @BindView(R.id.result)
     EditText mResultView;
-
     @BindView(R.id.fakeDelay)
     CheckBox mFakeDelay;
 
@@ -55,6 +51,7 @@ public class MainFragment extends Fragment {
         return view;
     }
 
+    // I must write all logic in one Rx sequence (i don't wont, but i must). So, here it is.
     private void startSubscriptions() {
         Observable.merge(
                 RxTextView.afterTextChangeEvents(mRegularExpressionView).distinctUntilChanged(event -> event.editable().toString()),
@@ -82,8 +79,7 @@ public class MainFragment extends Fragment {
         }).scan((disposable, disposable2) -> {
             disposable.dispose();
             return disposable2;
-        })
-                .subscribe();
+        }).subscribe();
     }
 
 
