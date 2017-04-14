@@ -7,8 +7,19 @@ import android.support.annotation.NonNull;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import io.reactivex.functions.Cancellable;
+
 /**
- * Created by Egor on 12.04.2017.
+ * Class for work with regular expressions with parsing callback.
+ * <pre>{@code
+ * // Use listener
+ * Regex.replace("abcd", "bc", "BC", 0, listener );    // calls Listener with args "a -> a", "bc -> BC", "d -> d"
+ *
+ * // Use CancelationSignal
+ * CancelationSignal cancelationSignal = new CancelationSignalImpl();
+ * Regex.replace("abcd", "(bc)", "_$1_", 0, listener, cancelationSignal );
+ * cancelationSignal.cancel();                         // cancelationSignal stop parsing process.
+ * }</pre>
  */
 
 public class Regex {
@@ -178,6 +189,20 @@ public class Regex {
 
         public void cancel() {
             throw new UnsupportedOperationException("Fake realization of CancellationSignal");
+        }
+    }
+
+    public static class CancellationSignalImpl implements Regex.CancellationSignal, Cancellable {
+        boolean isCanceled;
+
+        @Override
+        public boolean isCanceled() {
+            return isCanceled;
+        }
+
+        @Override
+        public void cancel() {
+            isCanceled = true;
         }
     }
 }
