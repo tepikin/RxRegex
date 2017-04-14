@@ -51,9 +51,9 @@ RxRegex.replace(input, regex, replacement)
                                                      //    !AB!        -> ABCD
 ```
 ```java
-Disposable disposable = RxRegex.replace(input, regex, replacement)      
+Disposable disposable = RxRegex.replace(input, regex, replacement)
     .filter(RxRegex.OnAppend::isMatched)             // filter parts matched to regex
-    .subscribe(replace -> log(replace.toString()));  // logs out:                                                         
+    .subscribe(replace -> log(replace.toString()));  // logs out:
                                                      //    !12! -> ABCD
                                                      //    !AB! -> ABCD
 disposable.dispose();  // you can stop parsing at any time.
